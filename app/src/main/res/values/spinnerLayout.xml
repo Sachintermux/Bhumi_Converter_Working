@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="firstList">
+        <item>Yard</item>
+        <item>Feet</item>
+        <item>Inch</item>
+        <item>Meter</item>
+        <item>Centimeter</item>
+        <item>Katha</item>
+        <item>Decimile</item>
+        <item>Dhurki</item>
+        <item>Furki</item>
+        <item>Dhur</item>
+        <item>Hecteyar</item>
+        <item>[Dhur]<sup><small>2</small></sup></item>
+        <item>[Inch]<sup><small>2</small></sup></item>
+
+    </string-array>
+</resources>
