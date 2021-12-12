@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentTransaction;
 public class MainActivity extends AppCompatActivity implements SecondFragment.secondFragment_InterFace, FirstFragment.firstFragment_InterFace {
     private FirstFragment firstFragment;
     private SecondFragment secondFragment;
+    private SelectStateFrament selectStateFrament;
     private ConvertBhumi convertBhumi;
     private CharSequence SecondFragment_SpinnerData = "";
     private CharSequence FirstFragment_SpinnerData = "";
@@ -25,14 +26,13 @@ public class MainActivity extends AppCompatActivity implements SecondFragment.se
         firstFragment = new FirstFragment();
         secondFragment = new SecondFragment();
         convertBhumi = new ConvertBhumi();
-
+selectStateFrament = new SelectStateFrament();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.firstFragment, firstFragment);
         ft.replace(R.id.secondFragment, secondFragment);
+        ft.replace(R.id.selectStateFragment, selectStateFrament);
         ft.commit();
-//        SaveDataOnSharePref saveDataOnSharePref = new SaveDataOnSharePref();
-//        Log.i("Hello" ,"Hello " + saveDataOnSharePref.getData(this,"SAVE_SECOND_EDIT_TEXT_DATA"));
     }
 
 
@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements SecondFragment.se
         ans = convertBhumi.useFormula(FirstFragment_Edt_TextData, data, SecondFragment_SpinnerData);
         if(Character.isAlphabetic(ans.charAt(0))) showToast();
         else secondFragment.setSecondEdt_Text(ans);
-
     }
 
     @Override

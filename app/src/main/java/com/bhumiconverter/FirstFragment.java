@@ -1,14 +1,10 @@
 package com.bhumiconverter;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,15 +23,20 @@ public class FirstFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private final String SPINNER_SHAREPREF_TAG = "SAVE_FIRST_SPINNER_DATA";
     private final String EDITTEXT_SHAREPREF_TAG = "SAVE_FIRST_EDITTEXT_DATA";
+    boolean focusCheck1 = false;
     private SaveDataOnSharePref saveDataOnSharePref;
     private Spinner spinner;
     private CharSequence currentEdt_TextData = "";
     private CharSequence currentSpinner_data = "";
-    private boolean flag = false;
     private EditText firstEdt_Text;
+    private EditText feetFirstEdt_Text_View;
+    private EditText inchFirstEdt_Text_View;
+    private TextView showInchText_View;
     private firstFragment_InterFace listener;
+    private double feetData_EdtText_View = 0, inchData_EdtText_View = 0;
+    private boolean flagFeet = false, flagInch = false, flag = false;
     private boolean firstTimeStart = false;
-private boolean focusCheck = false;
+    private boolean focusCheck = false;
 
     public FirstFragment() {
 
@@ -50,19 +52,33 @@ private boolean focusCheck = false;
     }
 
     public void setFirstEdt_Text( CharSequence s ) {
-        if(firstTimeStart)
-        firstEdt_Text.setText(s);
-        else {
+        if (firstTimeStart) {
+            if (!flagInch && !flagFeet) {
+                double data = Double.parseDouble(String.valueOf(s));
+                data *= 12;
+                feetData_EdtText_View = data / 12;
+                inchData_EdtText_View = data % 12;
+                feetFirstEdt_Text_View.setText(String.valueOf((int) feetData_EdtText_View));
+                inchFirstEdt_Text_View.setText(String.valueOf(inchData_EdtText_View));
+            }
+            firstEdt_Text.setText(s);
+        } else {
+            double data = Double.parseDouble(String.valueOf(s));
+            data *= 12;
+            feetData_EdtText_View = data / 12;
+            inchData_EdtText_View = data % 12;
+            feetFirstEdt_Text_View.setText(String.valueOf((int) feetData_EdtText_View));
+            inchFirstEdt_Text_View.setText(String.valueOf(inchData_EdtText_View));
             firstEdt_Text.setText(currentEdt_TextData);
-            firstTimeStart = true;
         }
+        firstTimeStart = true;
     }
 
     @Override
     public void onPause() {
         String pos = String.valueOf(spinner.getSelectedItemPosition());
-      saveDataOnSharePref.setData(requireActivity(),SPINNER_SHAREPREF_TAG,pos);
-      saveDataOnSharePref.setData(requireActivity(),EDITTEXT_SHAREPREF_TAG,firstEdt_Text.getText().toString());
+        saveDataOnSharePref.setData(requireActivity(), SPINNER_SHAREPREF_TAG, pos);
+        saveDataOnSharePref.setData(requireActivity(), EDITTEXT_SHAREPREF_TAG, firstEdt_Text.getText().toString());
         super.onPause();
     }
 
@@ -77,19 +93,15 @@ private boolean focusCheck = false;
     }
 
     private void setFirstEdt_Text( View view ) {
-
         firstEdt_Text = view.findViewById(R.id.firstEdt_Text);
         firstEdt_Text.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @SuppressLint("ResourceAsColor")
             @Override
             public void onFocusChange( View v, boolean hasFocus ) {
                 flag = hasFocus;
-                if (checkDecimal(currentEdt_TextData) && flag && focusCheck) {
-                    Log.i("Hello" , "First");
+                if (checkDecimal(currentEdt_TextData, firstEdt_Text) && flag && focusCheck) {
                     listener.onStartFirstFragmentData(currentSpinner_data);
                     listener.onInputFirstFragment(currentEdt_TextData, (String) currentSpinner_data);
-                }
-                else {
+                } else {
                     focusCheck = true;
                 }
             }
@@ -102,7 +114,7 @@ private boolean focusCheck = false;
             @Override
             public void onTextChanged( CharSequence s, int start, int before, int count ) {
                 currentEdt_TextData = s;
-                if (checkDecimal(s) && flag) {
+                if (checkDecimal(s, firstEdt_Text) && flag) {
                     listener.onInputFirstFragment(s, (String) currentSpinner_data);
                 }
             }
@@ -113,32 +125,128 @@ private boolean focusCheck = false;
         });
     }
 
+    private void setFeetAndInch() {
+
+        feetFirstEdt_Text_View.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange( View v, boolean hasFocus ) {
+                flagFeet = hasFocus;
+
+                if (checkDecimal(currentEdt_TextData, firstEdt_Text) && flagFeet && focusCheck1) {
+                    feetData_EdtText_View = hasDataOrNot(feetFirstEdt_Text_View);
+                    inchData_EdtText_View = hasDataOrNot(inchFirstEdt_Text_View);
+                    listener.onStartFirstFragmentData(currentSpinner_data);
+                    currentEdt_TextData = String.valueOf(feetData_EdtText_View + (inchData_EdtText_View / 12));
+                    listener.onInputFirstFragment(currentEdt_TextData, (String) currentSpinner_data);
+                } else {
+                    focusCheck1 = true;
+                }
+            }
+        });
+        feetFirstEdt_Text_View.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged( CharSequence s, int start, int count, int after ) {
+
+            }
+
+            @Override
+            public void onTextChanged( CharSequence s, int start, int before, int count ) {
+                if (checkDecimal(s, feetFirstEdt_Text_View) && flagFeet) {
+                    feetData_EdtText_View = hasDataOrNot(feetFirstEdt_Text_View);
+                    inchData_EdtText_View = hasDataOrNot(inchFirstEdt_Text_View);
+                    currentEdt_TextData = String.valueOf(feetData_EdtText_View + inchData_EdtText_View / 12);
+                    listener.onInputFirstFragment(currentEdt_TextData, (String) currentSpinner_data);
+                } else {
+                    if (checkDecimal(s, feetFirstEdt_Text_View) && flagInch) {
+                        inchData_EdtText_View = hasDataOrNot(inchFirstEdt_Text_View);
+                        currentEdt_TextData = String.valueOf(inchData_EdtText_View / 12);
+                        listener.onInputFirstFragment(currentEdt_TextData, (String) currentSpinner_data);
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged( Editable s ) {
+
+            }
+        });
+        inchFirstEdt_Text_View.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange( View v, boolean hasFocus ) {
+                flagInch = hasFocus;
+
+                if (checkDecimal(currentEdt_TextData, firstEdt_Text) && flagInch && focusCheck1) {
+                    feetData_EdtText_View = hasDataOrNot(feetFirstEdt_Text_View);
+                    inchData_EdtText_View = hasDataOrNot(inchFirstEdt_Text_View);
+                    currentEdt_TextData = String.valueOf((feetData_EdtText_View) + inchData_EdtText_View / 12);
+                    listener.onInputFirstFragment(currentEdt_TextData, (String) currentSpinner_data);
+                } else {
+                    focusCheck1 = true;
+                }
+            }
+        });
+        inchFirstEdt_Text_View.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged( CharSequence s, int start, int count, int after ) {
+
+            }
+
+            @Override
+            public void onTextChanged( CharSequence s, int start, int before, int count ) {
+                if (checkDecimal(s, inchFirstEdt_Text_View) && flagInch) {
+                    inchData_EdtText_View = hasDataOrNot(inchFirstEdt_Text_View);
+                    feetData_EdtText_View = hasDataOrNot(feetFirstEdt_Text_View);
+                    currentEdt_TextData = String.valueOf(inchData_EdtText_View / 12 + feetData_EdtText_View);
+                    listener.onInputFirstFragment(currentEdt_TextData, (String) currentSpinner_data);
+                } else {
+                    if (checkDecimal(s, inchFirstEdt_Text_View) && flagFeet) {
+                        feetData_EdtText_View = hasDataOrNot(feetFirstEdt_Text_View);
+                        currentEdt_TextData = String.valueOf(feetData_EdtText_View);
+                        listener.onInputFirstFragment(currentEdt_TextData, (String) currentSpinner_data);
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged( Editable s ) {
+
+            }
+        });
+
+    }
+
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState ) {
         View view = inflater.inflate(R.layout.fragment_first, container, false);
         saveDataOnSharePref = new SaveDataOnSharePref();
-        String dataForEditText = saveDataOnSharePref.getData(requireActivity(), EDITTEXT_SHAREPREF_TAG);
-        currentEdt_TextData = dataForEditText;
+        feetFirstEdt_Text_View = view.findViewById(R.id.firstEdt_Feet_view);
+        inchFirstEdt_Text_View = view.findViewById(R.id.firstEdt_Inch_view);
+        showInchText_View = view.findViewById(R.id.firstText_Inch_view);
+        currentEdt_TextData = saveDataOnSharePref.getData(requireActivity(), EDITTEXT_SHAREPREF_TAG, "0");
         setFirstEdt_Text(view);
         setFirstSpinner(view);
+        setFeetAndInch();
         return view;
     }
 
-    private void setFirstSpinner( View view ) {
-        spinner = view.findViewById(R.id.FirstSpinner);
+    private void setFirstSpinner( View v ) {
+        spinner = v.findViewById(R.id.FirstSpinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
-                R.array.firstList, android.R.layout.simple_spinner_item);
+                R.array.convertList, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
-      int position = Integer.parseInt(saveDataOnSharePref.getData(requireActivity(),SPINNER_SHAREPREF_TAG));
+        int position = Integer.parseInt(saveDataOnSharePref.getData(requireActivity(), SPINNER_SHAREPREF_TAG, "1"));
         spinner.setSelection(position);
         currentSpinner_data = adapter.getItem(position);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             public void onItemSelected( AdapterView<?> parent, View view, int position, long id ) {
-                if (checkDecimal(currentEdt_TextData)) {
-                    currentSpinner_data = parent.getItemAtPosition(position).toString();
+                currentSpinner_data = parent.getItemAtPosition(position).toString();
+                if (checkDecimal(currentEdt_TextData, firstEdt_Text)) {
+                    if (String.valueOf(currentSpinner_data).endsWith("Feet")) {
+                        feetIsVisible();
+                    } else feetIsInvisible();
                     listener.onStartFirstFragmentData(currentSpinner_data);
                 }
             }
@@ -166,28 +274,50 @@ private boolean focusCheck = false;
         listener = null;
     }
 
-    private boolean checkDecimal( CharSequence a ) {
+    private void feetIsVisible() {
+        firstEdt_Text.setVisibility(View.GONE);
+        feetFirstEdt_Text_View.setVisibility(View.VISIBLE);
+        inchFirstEdt_Text_View.setVisibility(View.VISIBLE);
+        showInchText_View.setVisibility(View.VISIBLE);
+
+    }
+
+    private void feetIsInvisible() {
+        firstEdt_Text.setVisibility(View.VISIBLE);
+        feetFirstEdt_Text_View.setVisibility(View.GONE);
+        inchFirstEdt_Text_View.setVisibility(View.GONE);
+        showInchText_View.setVisibility(View.GONE);
+    }
+
+    private double hasDataOrNot( EditText view ) {
+        String data = view.getText().toString();
+        if (data.length() <= 0) return 0;
+        return Double.parseDouble(data);
+    }
+
+    private boolean checkDecimal( CharSequence a, EditText view ) {
         CharSequence s = a;
         int count = 0;
         boolean flag = false;
         for (int i = 0; i < s.length(); i++) {
             if (s.charAt(i) == '.') count++;
-            else if (Character.isAlphabetic(s.charAt(i)) && s.charAt(i) != 'E'|| Character.isSpaceChar(s.charAt(i))) {
+            else if (!Character.isDigit(s.charAt(i)) && s.charAt(i) != 'E') {
                 flag = true;
             }
         }
         if (count > 1 || flag) {
-            firstEdt_Text.setTextColor(Color.RED);
+            view.setTextColor(Color.RED);
             if (count > 1)
                 Toast.makeText(getActivity(), "You Can't Enter two decimal", Toast.LENGTH_SHORT).show();
             if (flag)
                 Toast.makeText(getActivity(), "You Can't Enter Character Value", Toast.LENGTH_SHORT).show();
-        } else firstEdt_Text.setTextColor(Color.BLACK);
+        } else view.setTextColor(Color.BLACK);
         return count <= 1 && !flag;
     }
 
     public interface firstFragment_InterFace {
         void onInputFirstFragment( CharSequence s, String data );
+
         void onStartFirstFragmentData( CharSequence data );
     }
 }

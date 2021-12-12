@@ -13,9 +13,9 @@ public class SaveDataOnSharePref {
         editor.putString(TAG, data);
         editor.apply();
     }
-    public String getData(@NonNull Context context, String TAG){
+    public String getData(@NonNull Context context, String TAG,String defaultData){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String position = preferences.getString(TAG,"0");
+        String position = preferences.getString(TAG,defaultData);
         return String.valueOf(position);
     }
 }

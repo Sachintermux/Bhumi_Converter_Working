@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="firstList">
+    <string-array name="convertList">
         <item>Yard</item>
         <item>Feet</item>
         <item>Inch</item>
@@ -9,6 +9,7 @@
         <item>Katha</item>
         <item>Decimile</item>
         <item>Dhurki</item>
+        <item>Kadi</item>
         <item>Furki</item>
         <item>Dhur</item>
         <item>Hecteyar</item>
