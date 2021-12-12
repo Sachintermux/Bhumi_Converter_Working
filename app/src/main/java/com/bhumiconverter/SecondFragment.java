@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ public class SecondFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private final String SPINNER_SHAREPREF_TAG = "SAVE_SECOND_SPINNER_DATA";
     private final String EDIT_TEXT_SHAREPREF_TAG = "SAVE_SECOND_EDIT_TEXT_DATA";
+    private final String FEET_EDT_TEXT_SHAREPREF_TAG = "FEET_SAVE_SECOND_EDIT_TEXT_DATA";
     public secondFragment_InterFace listener;
     boolean firstTimeFocusCheck = false;
     private Spinner spinner;
@@ -54,25 +56,24 @@ public class SecondFragment extends Fragment {
 
     public void setSecondEdt_Text( CharSequence s ) {
         if (firstTimeStart) {
-            if (!flagInch && !flagFeet) {
-                double data = Double.parseDouble(String.valueOf(s));
+            double data = Double.parseDouble(String.valueOf(s));
                 data *= 12;
                 feetData_EdtText_View = data / 12;
                 inchData_EdtText_View = data % 12;
                 feetSecondEdt_Text_View.setText(String.valueOf((int) feetData_EdtText_View));
                 inchSecondEdt_Text_View.setText(String.valueOf(inchData_EdtText_View));
-            }
             secondEdt_Text.setText(s);
         } else {
-            double data = Double.parseDouble(String.valueOf(s));
+            double data = Double.parseDouble(String.valueOf(currentEdt_TextData));
             data *= 12;
             feetData_EdtText_View = data / 12;
             inchData_EdtText_View = data % 12;
             feetSecondEdt_Text_View.setText(String.valueOf((int) feetData_EdtText_View));
             inchSecondEdt_Text_View.setText(String.valueOf(inchData_EdtText_View));
             secondEdt_Text.setText(currentEdt_TextData);
+            firstTimeStart = true;
         }
-        firstTimeStart = true;
+
     }
 
     @Override
@@ -90,6 +91,10 @@ public class SecondFragment extends Fragment {
         String pos = String.valueOf(spinner.getSelectedItemPosition());
         saveDataOnSharePref.setData(requireActivity(), SPINNER_SHAREPREF_TAG, pos);
         saveDataOnSharePref.setData(requireActivity(), EDIT_TEXT_SHAREPREF_TAG, secondEdt_Text.getText().toString());
+        feetData_EdtText_View = hasDataOrNot(feetSecondEdt_Text_View);
+        inchData_EdtText_View = hasDataOrNot(inchSecondEdt_Text_View);
+        currentEdt_TextData = String.valueOf(feetData_EdtText_View + inchData_EdtText_View/12);
+        saveDataOnSharePref.setData(requireActivity(),FEET_EDT_TEXT_SHAREPREF_TAG,String.valueOf(currentEdt_TextData));
         super.onPause();
     }
 
@@ -101,7 +106,9 @@ public class SecondFragment extends Fragment {
         feetSecondEdt_Text_View = view.findViewById(R.id.secondEdt_Feet_view);
         inchSecondEdt_Text_View = view.findViewById(R.id.secondEdt_Inch_view);
         showInchText_View = view.findViewById(R.id.secondText_Inch_view);
-        String dataForEditText = saveDataOnSharePref.getData(requireActivity(), EDIT_TEXT_SHAREPREF_TAG, "0");
+        String dataForEditText = saveDataOnSharePref.getData(requireActivity(), EDIT_TEXT_SHAREPREF_TAG, "-1");
+        if(dataForEditText.endsWith("-1")) dataForEditText = saveDataOnSharePref.getData(requireActivity(),FEET_EDT_TEXT_SHAREPREF_TAG,"-1");
+        if(dataForEditText.endsWith("-1")) dataForEditText = "0";
         currentEdt_TextData = dataForEditText;
         setSpinner(view);
         setSecondEdt_Text(view);

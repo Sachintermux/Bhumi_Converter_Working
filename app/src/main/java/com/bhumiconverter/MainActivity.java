@@ -1,7 +1,6 @@
 package com.bhumiconverter;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements SecondFragment.se
         firstFragment = new FirstFragment();
         secondFragment = new SecondFragment();
         convertBhumi = new ConvertBhumi();
-selectStateFrament = new SelectStateFrament();
+        selectStateFrament = new SelectStateFrament();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.firstFragment, firstFragment);
@@ -40,7 +39,7 @@ selectStateFrament = new SelectStateFrament();
     public void onInputSecondFragment( CharSequence s, String data ) {
         SecondFragment_Edt_TextData = s;
         ans = convertBhumi.useFormula(s, data, FirstFragment_SpinnerData);
-        if(Character.isAlphabetic(ans.charAt(0))) showToast();
+        if (Character.isAlphabetic(ans.charAt(0))) showToast();
         else firstFragment.setFirstEdt_Text(ans);
     }
 
@@ -49,8 +48,8 @@ selectStateFrament = new SelectStateFrament();
         SecondFragment_SpinnerData = data;
         if (onStart) {
             ans = convertBhumi.useFormula(FirstFragment_Edt_TextData, (String) FirstFragment_SpinnerData, SecondFragment_SpinnerData);
-            if(Character.isAlphabetic(ans.charAt(0))) showToast();
-            else  secondFragment.setSecondEdt_Text(ans);
+            if (Character.isAlphabetic(ans.charAt(0))) showToast();
+            else secondFragment.setSecondEdt_Text(ans);
         }
         onStart = true;
     }
@@ -59,7 +58,7 @@ selectStateFrament = new SelectStateFrament();
     public void onInputFirstFragment( CharSequence s, String data ) {
         FirstFragment_Edt_TextData = s;
         ans = convertBhumi.useFormula(FirstFragment_Edt_TextData, data, SecondFragment_SpinnerData);
-        if(Character.isAlphabetic(ans.charAt(0))) showToast();
+        if (Character.isAlphabetic(ans.charAt(0))) showToast();
         else secondFragment.setSecondEdt_Text(ans);
     }
 
@@ -67,10 +66,11 @@ selectStateFrament = new SelectStateFrament();
     public void onStartFirstFragmentData( CharSequence data ) {
         FirstFragment_SpinnerData = data;
         ans = convertBhumi.useFormula(SecondFragment_Edt_TextData, SecondFragment_SpinnerData, FirstFragment_SpinnerData);
-        if(Character.isAlphabetic(ans.charAt(0)))  showToast();
-           else firstFragment.setFirstEdt_Text(ans);
+        if (Character.isAlphabetic(ans.charAt(0))) showToast();
+        else firstFragment.setFirstEdt_Text(ans);
     }
-    private void showToast(){
+
+    private void showToast() {
         Toast.makeText(this, "We can't convert value at this time\nBecause i am in development phase", Toast.LENGTH_SHORT).show();
     }
 }
